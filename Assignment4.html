@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> <!-- ensure proper character encoding for the page -->
+    <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- make layout render well on all devices -->
+    <title>Rawal's Go KU! Page</title> <!-- REQUIRED: replace "Rawal" with your last name if different -->
+
+    <style>
+      /* Minimal styling for spacing (coloring is handled in JS per assignment). */
+      tab-panel button { margin-right: 8px; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; }
+      tab-panel div { margin-top: 10px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    </style>
+  </head>
+  <body>
+
+    <!-- Tab content container using the provided skeleton. -->
+    <tab-panel id="ku-tabs">
+      <div data-tabname="Rock">Rock ...</div>
+      <div data-tabname="Chalk">Rock Chalk ...</div>
+      <div data-tabname="Jayhawk">Rock Chalk Jayhawk ...</div>
+      <div data-tabname="Go KU!">Rock Chalk Jayhawk - Go KU!</div>
+    </tab-panel>
+
+    <script>
+      /*
+        EECS 468 Assignment — Simple Tabbed Interface (asTabs)
+        ------------------------------------------------------
+        Program Name in File: EECS 468 Assignment — Tabbed Panels
+        Brief Description: Builds a tabbed UI from the children of a <tab-panel> node. For each
+        child element, a <button> is created using its data-tabname. Clicking a button shows its
+        corresponding child and hides the others. The active button is colored red; inactive
+        buttons are blue. On startup, the "Rock" tab (the first child) is selected and shown.
+      */
+
+      // asTabs takes a DOM node and converts its direct children into a tabbed interface.                      
+      function asTabs(node) { // define the function named asTabs that accepts a DOM node argument
+        var children = Array.from(node.children); // collect the element children into a true Array for iteration
+        var buttonBar = document.createElement('div'); // create a container <div> that will hold all the tab buttons
+        node.insertBefore(buttonBar, node.firstChild); // insert the button bar at the very top of the tab panel
+
+        var buttons = []; // keep a list of the buttons so we can recolor them when selection changes
+
+        // select(index): shows the child at `index`, hides the rest, and updates button colors              
+        function select(index) { // declare a helper function that selects a specific tab by its index
+          children.forEach(function(child, i) { // loop over each child content element with its index
+            child.style.display = (i === index ? '' : 'none'); // show selected child (empty string = default), hide others with display: none
+          }); // end children.forEach
+          buttons.forEach(function(btn, i) { // loop over each corresponding button to update its appearance
+            btn.style.backgroundColor = (i === index ? 'red' : 'blue'); // set the active button red, all others blue as required
+            btn.style.color = 'white'; // make text readable against red/blue backgrounds (accessibility improvement)
+            btn.setAttribute('aria-selected', (i === index ? 'true' : 'false')); // mark selection state for accessibility tools
+          }); // end buttons.forEach
+        } // end select
+
+        // Build one <button> for each child and wire up its click behavior                                     
+        children.forEach(function(child, i) { // iterate over each content child and its index
+          var label = child.getAttribute('data-tabname'); // read the tab label text from the data-tabname attribute
+          var btn = document.createElement('button'); // create a new <button> element for this tab
+          btn.type = 'button'; // explicitly set type to button to avoid any default form behavior
+          btn.textContent = label; // set the button's visible text to the label we just read
+          btn.setAttribute('role', 'tab'); // optional ARIA role to hint that this is a tab control
+          btn.addEventListener('click', function() { select(i); }); // on click, select the tab matching this index
+          buttonBar.appendChild(btn); // add the button to the button bar so it appears above the content
+          buttons.push(btn); // store the button so we can recolor it when selection changes
+        }); // end children.forEach (button building)
+
+        select(0); // INITIAL STATE: select the first tab ("Rock") so it starts highlighted and visible
+      } // end asTabs
+
+      // Initialize the tabbed UI after the DOM is ready and then run asTabs on the provided <tab-panel>.
+      document.addEventListener('DOMContentLoaded', function() { // wait until the document structure has been parsed
+        asTabs(document.querySelector('tab-panel')); // call asTabs using the first <tab-panel> element in the document
+      }); // end DOMContentLoaded listener
+    </script>
+  </body>
+</html>
